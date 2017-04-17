@@ -24,7 +24,7 @@ $app->get('/requestedparking/:input', function($input) {
                 jsonResponse(200,$response);
             }    
         });
-
+//attendant List API
 $app->get('/attendantlist/:input', function($input) {
            
            $response = array();
