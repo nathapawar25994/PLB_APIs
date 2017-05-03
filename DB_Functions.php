@@ -267,23 +267,7 @@ class DB_Functions
 			{
 			$miles = $user['miles'];
 			}
-			$sql1 = "SELECT id, ( 3959 * acos( cos( radians('" . $lat . "') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('" . $long . "') ) + sin( radians('" . $lat . "') ) * sin( radians( latitude ) ) ) ) AS distance FROM parking_lot_master WHERE STATUS =1 HAVING distance < " . $miles . " ORDER BY distance LIMIT 0 , 20";
-		$res1 = $this->conn->query($sql1);
-        $i=0;
-		$data=array();
-		while($user=$res1->fetch_assoc()){
-		  $data[$i]=$user['id'];
-		  $sql2 = "select * from like_dislike where parking_id = '".$data[$i]."'";
-		  $res2 = $this->conn->query($sql2);
-		  $data1=array();
-		while($user=$res2->fetch_assoc()){
-		$data1[$i]=$user['status'];
-        print_r(array_merge($data,$data1));
-		}
-    	  $i++;
-		}
-		die();
-		//print_r($data);die();
+			
 		$sql = "SELECT *, ( 3959 * acos( cos( radians('" . $lat . "') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('" . $long . "') ) + sin( radians('" . $lat . "') ) * sin( radians( latitude ) ) ) ) AS distance FROM parking_lot_master WHERE STATUS =1 HAVING distance < " . $miles . " ORDER BY distance LIMIT 0 , 20";
 		$res = $this->conn->query($sql);
 		if ($res)
