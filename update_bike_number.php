@@ -5,7 +5,8 @@ if (isset($_POST['user_id'] ) && isset($_POST['bike_numbers'])) {
 	 
 	 $user_id=$_POST['user_id'];
 	 $bike_numbers=$_POST['bike_numbers'];
-	 $result = $db->update_bike_numbers($user_id,$bike_numbers);
+	 $miles=$_POST['miles'];
+	 $result = $db->update_bike_numbers($user_id,$bike_numbers,$miles);
 	 if ($result != false) {
 		 $response["status"] =1;
 	    $response["error_msg"] = "bike_number updated successfully!";

@@ -27,7 +27,7 @@ $db = new DB_Functions();
         if ($user) {
             // user stored successfully
             $response["status"] =1;
-            
+            $response["user"]["user_id"] = $user["user_id"];
             $response["user"]["full_name"] = $user["full_name"];
             $response["user"]["email_id"] = $user["email_id"];
             $response["user"]["mobile_no"]=$user["mobile_no"];
