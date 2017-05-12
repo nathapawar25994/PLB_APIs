@@ -29,7 +29,12 @@ if (!isset($_POST['user_id'] )) {
 	 $parking_id=$_POST['parking_id'];
 	 $reserv_date=$_POST['reserv_date'];
 	 $user = $db->reservLot($from_time,$to_time,$lot_no,$user_id,$parking_id,$reserv_date);
-	 if ($user != false) {
+	 
+	 if ($user == 2) {
+		 $response["status"] =3;
+	    $response["error_msg"] = "This Lot is alredy booked by you!";
+	 echo json_encode($response);
+	 }else if($user == 1) {
 		 $response["status"] =1;
 	    $response["error_msg"] = "Lot added successfully!";
 	 echo json_encode($response);

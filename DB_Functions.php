@@ -55,18 +55,25 @@ class DB_Functions
 
 	function reservLot($from_time, $to_time, $lot_no, $user_id, $parking_id, $reserv_date)
 		{
+			$sql = "select * from reservlot rl WHERE  rl.user_id='" . $user_id . "' and rl.lot_no='" . $lot_no . "' and rl.parking_id='" . $parking_id . "' and rl.reserv_date='" . $reserv_date . "'";
+		$res = $this->conn->query($sql);
+			if(mysqli_num_rows($res)>0){
+				return 2;
+			}else{
+			
 		$status = 0;
 		$query = "insert into reservlot(user_id,parking_id,from_time,to_time,lot_no,reserv_date,status)values('" . $user_id . "','" . $parking_id . "','" . $from_time . "','" . $to_time . "','" . $lot_no . "','" . $reserv_date . "','" . $status . "')";
 		$result = $this->conn->query($query);
 		if ($result)
 			{
-			return $result;
+			return 1;
 			}
 		  else
 			{
 			return false;
 			}
 		}
+	}
 
 	public
 
@@ -102,12 +109,54 @@ class DB_Functions
 
 	public
 
-	function get_list($user_id, $parking_id)
+	function get_list($user_id)
 		{
-		$sql = "select rl.user_id,rl.status,plm.lot_name,rl.lot_no,rl.reserv_date,rl.from_time from reservlot rl,parking_lot_master plm WHERE rl.parking_id=plm.id and rl.user_id='" . $user_id . "' and rl.parking_id='" . $parking_id . "'";
+         $sql1="select parking_id from reservlot where user_id='".$user_id."'";
+		$res1 = $this->conn->query($sql1); 
+		 $i=0;
+		 $data1=array();
+		 while($user=$res1->fetch_assoc()){
+		 $data1[$i]=$user['parking_id'];
+		 $i++;
+		 }
+		 $response=array();
+		 
+		 $uniq=array();
+		 $uniq=array_unique($data1);
+		 
+		for($j=0;$j<count($uniq);$j++){
+			
+			$parking_id=$uniq[$j];
+		$sql = "select  rl.user_id,rl.status,plm.latitude,plm.longitude,plm.lot_name,rl.lot_no,rl.reserv_date,rl.from_time from reservlot rl,parking_lot_master plm WHERE rl.parking_id=plm.id and rl.user_id='" . $user_id . "' and rl.parking_id='" .$parking_id. "'";
+		
 		$res = $this->conn->query($sql);
-		if ($res)
+		$data=array();
+		$k=0;
+		          while($user1=$res->fetch_assoc()){
+				    $data[$k]['id']=$user1['user_id'];
+					$data[$k]['status']=$user1['status'];
+					$data[$k]['lot_name']=$user1['lot_name'];
+					$data[$k]['lot_no']=$user1['lot_no'];
+					$data[$k]['latitude']=$user1['latitude'];
+					$data[$k]['longitude']=$user1['longitude'];
+					$data[$k]['reserv_date']=$user1['reserv_date'];
+					$data[$k]['from_time']=$user1['from_time'];
+				  $k++;
+				 }
+				    $response=$data;
+				
+					
+		     }
+		 return $response;
+		}
+
+	public 	function countsoflots()
+		{
+		$sql = "select rl.lot_no,rl.parking_id from reservlot rl WHERE  rl.status=1";
+		$res = $this->conn->query($sql);
+		if (mysqli_num_rows($res) > 0)
 			{
+				
 			return $res;
 			}
 		  else
@@ -115,23 +164,6 @@ class DB_Functions
 			return false;
 			}
 		}
-
-	public
-
-	function countsoflots($parking_id)
-		{
-		$sql = "select rl.lot_no,rl.status,plm.parking_owner,plm.lot_name,plm.two_wheeler,plm.car_parking,plm.heavy_vehicles from reservlot rl,parking_lot_master plm WHERE rl.parking_id=plm.id and rl.parking_id='" . $parking_id . "' and plm.id='" . $parking_id . "' and plm.status=1";
-		$res = $this->conn->query($sql);
-		if ($res)
-			{
-			return $res;
-			}
-		  else
-			{
-			return false;
-			}
-		}
-
 	public
 
 	function getreservedlots($parking_id, $date)
@@ -205,22 +237,25 @@ class DB_Functions
 			{
 			if ($result)
 				{
+					
 				return 0;
 				}
 			  else
 				{
-				return false;
+				return 1;
 				}
 			}
 		  else
 			{
 			if ($this->conn->affected_rows > 0)
 				{
-				return 1;
+					 
+				return 2;
 				}
 			  else
 				{
-				return false;
+					
+				return 3;
 				}
 			}
 		}
@@ -268,16 +303,59 @@ class DB_Functions
 			$miles = $user['miles'];
 			}
 			
+		  $sql2 = "select * from like_dislike where user_id = '".$user_id."' and status=1";
+		  $res2 = $this->conn->query($sql2);
+		  $data1=array();
+		  $i=0;
+		while($user1=$res2->fetch_assoc()){
+		$data1[$i]=$user1['parking_id'];
+		 $i++;
+		}
+		  
+		  $sql3 = "select lot_no from reservlot where user_id = '".$user_id."' and status=1";
+		  $res3 = $this->conn->query($sql3);
+		  $data3=array();
+		  $k=0;
+		while($user2=$res3->fetch_assoc()){
+		$data3[$k]=$user2['lot_no'];
+		 $k++;
+		}
+		  
+		 $commaList = implode(', ', $data1);
 		$sql = "SELECT *, ( 3959 * acos( cos( radians('" . $lat . "') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('" . $long . "') ) + sin( radians('" . $lat . "') ) * sin( radians( latitude ) ) ) ) AS distance FROM parking_lot_master WHERE STATUS =1 HAVING distance < " . $miles . " ORDER BY distance LIMIT 0 , 20";
 		$res = $this->conn->query($sql);
-		if ($res)
-			{
-		    return $res;
-			}
-		  else
-			{
-			return false;
-			}
+		$data=array();
+		
+		if(mysqli_num_rows($res)>0){
+			$response["status"] =1;
+	    $response["error_msg"] = "Location founded successfully!";
+		$i=0;
+		while($user=$res->fetch_assoc()){
+			
+        $data[$i]['id']=$user['id'];
+		$data[$i]['parking_owner']=$user['parking_owner'];
+		$data[$i]['lot_name']=$user['lot_name'];
+		$data[$i]['landmark']=$user['landmark'];
+		$data[$i]['city']=$user['city'];
+		$data[$i]['province']=$user['province'];
+		$data[$i]['country']=$user['country'];
+		$data[$i]['landmark']=$user['landmark'];
+		$data[$i]['latitude']=$user['latitude'];
+		$data[$i]['longitude']=$user['longitude'];
+		$data[$i]['is_complex']=$user['is_complex'];
+		$data[$i]['two_wheeler']=$user['two_wheeler'];
+		$data[$i]['car_parking']=$user['car_parking'];
+		$data[$i]['heavy_vehicles']=$user['heavy_vehicles'];
+		$data[$i]['status']=$user['status'];
+		$i++;
+		}
+		$response['parking_ids']=$commaList;
+		$response['data']=$data;
+		$response['lots']=$data3;
+		return $response;
+		 }else{
+			  return false;
+		     }
 		}
 
 	/**
@@ -308,13 +386,51 @@ class DB_Functions
 			return NULL;
 			}
 		}
+		
+		public function send_mail($email_id) {
+        $token=rand(111111,999999);
+         $query="update users set forgot_token='".$token."'  where email_id='".$email_id."'";
+        $res = $this->conn->query($query);
+        
+        if ($this->conn->affected_rows>0) {
+			$to      = $email_id;
+			$subject = 'Your Forgot Password Token';
+            $message = "Enter this token to reset your password-".$token;
+            $headers = 'From: info@deltabee.com' . "\r\n" .
+            'Reply-To: info@deltabee.com' . "\r\n" .
+            'X-Mailer: PHP/' . phpversion();
 
+           mail($to, $subject, $message, $headers);
+			
+			
+            return 1;
+        } else {
+            return NULL;
+        }
+    }
+		
+      public function enter_otp($email_id,$token,$password) {
+		$query1="select forgot_token from users where email_id='".$email_id."' ";
+         $res1 = $this->conn->query($query1);
+		 $user=$res1->fetch_assoc();
+		 $tok=$user['forgot_token'];
+		 if($tok==$token){
+         $query="update users set forgot_token='',password='".md5($password)."'  where email_id='".$email_id."' ";
+         
+		 $res = $this->conn->query($query);
+        if ($this->conn->affected_rows>0) {
+            return 1; 
+		 }else {
+            return NULL;
+        }
+		 }else{
+			 return 0;
+		 }
+    }
 	/**
 	 * Check user is existed or not
 	 */
-	public
-
-	function isUserExisted($email)
+	public 	function isUserExisted($email)
 		{
 		$stmt = $this->conn->prepare("SELECT email_id from users WHERE email_id = ?");
 		$stmt->bind_param("s", $email);

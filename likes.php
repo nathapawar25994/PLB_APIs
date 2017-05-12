@@ -19,13 +19,18 @@ if (!isset($_POST['user_id'] )) {
 	 $parking_id=$_POST['parking_id'];
 	 $status=$_POST['status'];
 	 $result = $db->updatelikedislike($user_id,$parking_id,$status);
-	// print_r($result);die();
+	
+	
 	 if ($result==0) {
-		$response["status"] =1;
+		$response["status"] =0;
 	    $response["msg"] = "Liked";
 		
 	 echo json_encode($response);
 	 }else if($result==1){
+		  $response["status"] =1;
+          $response["msg"] = "failed to like this parking";
+          echo json_encode($response);
+	 }else if($result==2){
 		  $response["status"] =2;
           $response["msg"] = "Dis-Liked";
           echo json_encode($response);

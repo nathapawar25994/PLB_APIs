@@ -69,9 +69,10 @@ $app->get('/attendantlist/:input', function($input) {
            $response = array();
        $db = new DbHandler();
        $reserve_id = $app->request->post('reserve_id');
+	   $user_id = $app->request->post('user_id');
 	   $token = $app->request->post('token');
        
-          $data = $db->allocate_parking($reserve_id,$token);
+          $data = $db->allocate_parking($reserve_id,$user_id,$token);
 
             if ($data != NULL) {
                 $response["error"] = false;
@@ -80,6 +81,48 @@ $app->get('/attendantlist/:input', function($input) {
             } else {
                 $response["error"] = true;
                 $response["message"] = "Confirmation failed. Please try again";
+                jsonResponse(200,$response);
+            }    
+           
+        });
+		
+		// send password through mail
+		$app->post('/send_mail', function() use ($app) {
+            
+           $response = array();
+       $db = new DbHandler();
+       $email_id = $app->request->post('email_id');
+	   
+          $data = $db->send_mail($email_id);
+
+            if ($data ==1) {
+                $response["error"] = false;
+                $response["message"] = "Mail sent on your email id";
+                jsonResponse(200,$response);
+            } else {
+                $response["error"] = true;
+                $response["message"] = "Please enter registered email id. And Please try again";
+                jsonResponse(200,$response);
+            }    
+           
+        });
+		$app->post('/enter_otp', function() use ($app) {
+            
+           $response = array();
+       $db = new DbHandler();
+       $token = $app->request->post('token');
+	   $email_id = $app->request->post('email_id');
+	   $password = $app->request->post('password');
+	   
+          $data = $db->enter_otp($email_id,$token,$password);
+
+            if ($data ==1) {
+                $response["error"] = false;
+                $response["message"] = "Correct OTP";
+                jsonResponse(200,$response);
+            } else {
+                $response["error"] = true;
+                $response["message"] = "Please enter vallid OTP. And Please try again";
                 jsonResponse(200,$response);
             }    
            
