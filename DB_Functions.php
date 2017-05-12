@@ -152,7 +152,9 @@ class DB_Functions
 
 	public 	function countsoflots()
 		{
-		$sql = "select rl.lot_no,rl.parking_id from reservlot rl WHERE  rl.status=1";
+		$today=date('Y-m-d');
+		$sql = "select rl.lot_no,rl.parking_id from reservlot rl WHERE reserv_date='".$today."' and rl.status=1";
+		
 		$res = $this->conn->query($sql);
 		if (mysqli_num_rows($res) > 0)
 			{

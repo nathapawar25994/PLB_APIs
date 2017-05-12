@@ -34,6 +34,7 @@ if (isset($_POST['user_id'] )) {
 	 }else{
 		 $response["status"] =2;
         $response["error_msg"] = "Wrong data. Please try again!";
+		$response=array();
         echo json_encode($response);
 	 }
 }else{

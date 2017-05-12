@@ -1,7 +1,7 @@
 <?php
 require_once 'DB_Functions.php';
 $db = new DB_Functions();
-if (isset($_POST['user_id'] ) && isset($_POST['bike_numbers'])) {
+if (isset($_POST['user_id'] ) && isset($_POST['bike_numbers']) && isset($_POST['miles'])) {
 	 
 	 $user_id=$_POST['user_id'];
 	 $bike_numbers=$_POST['bike_numbers'];
