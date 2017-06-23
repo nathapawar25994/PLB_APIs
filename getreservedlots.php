@@ -13,7 +13,9 @@ if (isset($_POST['parking_id'] ) && isset($_POST['reserv_date'])) {
 		$data['two_wheeler']=$user['two_wheeler'];
 		$data['car_parking']=$user['car_parking'];
 		$data['heavy_vehicles']=$user['heavy_vehicles'];
-		
+		$data['two_wheeler_rate']=$user['two_wheeler_rate'];
+		$data['car_parking_rate']=$user['car_parking_rate'];
+		$data['heavy_vehicles_rate']=$user['heavy_vehicles_rate'];
 		}
 		$response=$data;
 		$response["status"] =1;
@@ -27,12 +29,30 @@ if (isset($_POST['parking_id'] ) && isset($_POST['reserv_date'])) {
 		 
 	    
 		$i=0;
-		$data=array();
+		$j=0;
+		$k=0;
+		$p=0;
+		
+		$bike=array();
+		$car=array();
+		$truck=array();
 		while($user=$result->fetch_assoc()){
-		$data[$i]['lot_no']=$user['lot_no'];
+		//$bike[$i]['lot_no']=$user['lot_no'];
+		if($user['vehical_type']=='bike'){
+			$bike[$j]['lot_no']=$user['lot_no'];
+			$j++;
+		}else if($user['vehical_type']=='car'){
+			$car[$k]['lot_no']=$user['lot_no'];
+			$k++;
+		}else if($user['vehical_type']=='truck'){
+			$truck[$p]['lot_no']=$user['lot_no'];
+			$p++;
+		}
 		$i++;
 		}
-		$response['reserved_lots']=$data;
+		$response['reserved_lots']=$bike;
+		$response['car_lots']=$car;
+		$response['truck_lots']=$truck;
 	 
 	 }
 	 echo json_encode($response);

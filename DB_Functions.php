@@ -122,17 +122,26 @@ class DB_Functions
 		 $response=array();
 		 
 		 $uniq=array();
+		 $temp=array();
+		 $p=0;
+		 $s=0;
 		 $uniq=array_unique($data1);
-		 
-		for($j=0;$j<count($uniq);$j++){
+		 foreach($uniq as $value){
+			 $temp[$p]=$value;
+			 $p++;
+		 }
+		 //print_r($temp);die();
+		for($j=0;$j<count($temp);$j++){
 			
-			$parking_id=$uniq[$j];
+			$parking_id=$temp[$j];
 		$sql = "select  rl.user_id,rl.status,plm.latitude,plm.longitude,plm.lot_name,rl.lot_no,rl.reserv_date,rl.from_time from reservlot rl,parking_lot_master plm WHERE rl.parking_id=plm.id and rl.user_id='" . $user_id . "' and rl.parking_id='" .$parking_id. "'";
 		
 		$res = $this->conn->query($sql);
+		
 		$data=array();
 		$k=0;
 		          while($user1=$res->fetch_assoc()){
+					  
 				    $data[$k]['id']=$user1['user_id'];
 					$data[$k]['status']=$user1['status'];
 					$data[$k]['lot_name']=$user1['lot_name'];
@@ -143,10 +152,11 @@ class DB_Functions
 					$data[$k]['from_time']=$user1['from_time'];
 				  $k++;
 				 }
-				    $response=$data;
-				
+				    $response[$s]['data']=$data;
+				 $s++;
 					
 		     }
+			 
 		 return $response;
 		}
 
@@ -170,7 +180,7 @@ class DB_Functions
 
 	function getreservedlots($parking_id, $date)
 		{
-		$sql = "SELECT reservlot.lot_no,parking_lot_master.two_wheeler,parking_lot_master.car_parking,parking_lot_master.heavy_vehicles FROM `parking_lot_master`,reservlot where parking_lot_master.id=reservlot.parking_id and reservlot.parking_id='" . $parking_id . "' and reserv_date='" . $date . "' and parking_lot_master.status=1 and reservlot.status=1";
+		$sql = "SELECT reservlot.lot_no,reservlot.vehical_type,parking_lot_master.two_wheeler,parking_lot_master.car_parking,parking_lot_master.heavy_vehicles FROM `parking_lot_master`,reservlot where parking_lot_master.id=reservlot.parking_id and reservlot.parking_id='" . $parking_id . "' and reserv_date='" . $date . "' and parking_lot_master.status=1 and reservlot.status=1";
 		$res = $this->conn->query($sql);
 		if (mysqli_num_rows($res) != 0)
 			{
@@ -202,10 +212,48 @@ class DB_Functions
 
 	function get_fav_list($user_id)
 		{
-		$sql = "SELECT parking_id FROM like_dislike where user_id='" . $user_id . "' and status=1";
+		$i=0;
+		$data=array();
+		$sql = "SELECT DISTINCT  parking_id FROM like_dislike where user_id='" . $user_id . "' and status=1";
 		$res = $this->conn->query($sql);
-		$user = $res->fetch_assoc();
-		$parking_id = $user['parking_id'];
+		if (mysqli_num_rows($res) != 0){
+		while($user1=$res->fetch_assoc()){
+		
+		$parking_id = $user1['parking_id'];
+		$sql1 = "SELECT * FROM parking_lot_master where id='" . $parking_id . "' and status=1";
+		$result = $this->conn->query($sql1);
+		if (mysqli_num_rows($result) != 0){
+		while($user=$result->fetch_assoc()){
+		$data[$i]['id']=$user['id'];
+		$data[$i]['parking_owner']=$user['parking_owner'];
+		$data[$i]['lot_name']=$user['lot_name'];
+		$data[$i]['landmark']=$user['landmark'];
+		$data[$i]['city']=$user['city'];
+		$data[$i]['province']=$user['province'];
+		$data[$i]['country']=$user['country'];
+		$data[$i]['landmark']=$user['landmark'];
+		$data[$i]['latitude']=$user['latitude'];
+		$data[$i]['longitude']=$user['longitude'];
+		$data[$i]['is_complex']=$user['is_complex'];
+		$data[$i]['two_wheeler']=$user['two_wheeler'];
+		$data[$i]['car_parking']=$user['car_parking'];
+		$data[$i]['heavy_vehicles']=$user['heavy_vehicles'];
+		$data[$i]['status']=$user['status'];
+		
+		}
+		$i++;
+		}
+			
+		}
+		  return $data;
+		}else{
+			return false;
+		}
+		}
+     
+	   function get_lots($parking_id)
+		{
+		
 		$sql1 = "SELECT * FROM parking_lot_master where id='" . $parking_id . "' and status=1";
 		$result = $this->conn->query($sql1);
 		if (mysqli_num_rows($result) != 0)
@@ -217,7 +265,7 @@ class DB_Functions
 			return false;
 			}
 		}
-
+	 
 	public
 
 	function updatelikedislike($user_id, $parking_id, $status)
@@ -298,6 +346,7 @@ class DB_Functions
 
 	function findlocation($long, $lat, $user_id)
 		{
+			
 		$result = $this->conn->query("SELECT miles FROM users
  WHERE user_id='" . $user_id . "' ");
 		while ($user = $result->fetch_assoc())
@@ -313,7 +362,7 @@ class DB_Functions
 		$data1[$i]=$user1['parking_id'];
 		 $i++;
 		}
-		  
+		 
 		  $sql3 = "select lot_no from reservlot where user_id = '".$user_id."' and status=1";
 		  $res3 = $this->conn->query($sql3);
 		  $data3=array();
@@ -323,7 +372,7 @@ class DB_Functions
 		 $k++;
 		}
 		  
-		 $commaList = implode(', ', $data1);
+		 $commaList = implode(', ',$data1);
 		$sql = "SELECT *, ( 3959 * acos( cos( radians('" . $lat . "') ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians('" . $long . "') ) + sin( radians('" . $lat . "') ) * sin( radians( latitude ) ) ) ) AS distance FROM parking_lot_master WHERE STATUS =1 HAVING distance < " . $miles . " ORDER BY distance LIMIT 0 , 20";
 		$res = $this->conn->query($sql);
 		$data=array();
