@@ -1,6 +1,6 @@
 
 <?php
-
+//ini_set("display_errors", 0);
 // abc
 
 class DB_Functions
@@ -53,16 +53,16 @@ class DB_Functions
 
 	public
 
-	function reservLot($from_time, $to_time, $lot_no, $user_id, $parking_id, $reserv_date)
+	function reservLot($from_time, $to_time, $lot_no,$vehical_type,$user_id,$parking_id, $reserv_date)
 		{
-			$sql = "select * from reservlot rl WHERE  rl.user_id='" . $user_id . "' and rl.lot_no='" . $lot_no . "' and rl.parking_id='" . $parking_id . "' and rl.reserv_date='" . $reserv_date . "'";
+			$sql = "select * from reservlot rl WHERE  rl.user_id='" . $user_id . "' and rl.lot_no='" . $lot_no . "' and rl.parking_id='" . $parking_id . "' and rl.vehical_type='" . $vehical_type . "' and rl.reserv_date='" . $reserv_date . "'";
 		$res = $this->conn->query($sql);
 			if(mysqli_num_rows($res)>0){
 				return 2;
 			}else{
 			
 		$status = 0;
-		$query = "insert into reservlot(user_id,parking_id,from_time,to_time,lot_no,reserv_date,status)values('" . $user_id . "','" . $parking_id . "','" . $from_time . "','" . $to_time . "','" . $lot_no . "','" . $reserv_date . "','" . $status . "')";
+		$query = "insert into reservlot(user_id,parking_id,from_time,to_time,vehical_type,lot_no,reserv_date,status)values('" . $user_id . "','" . $parking_id . "','" . $from_time . "','" . $to_time . "','" . $vehical_type . "','" . $lot_no . "','" . $reserv_date . "','" . $status . "')";
 		$result = $this->conn->query($query);
 		if ($result)
 			{
@@ -123,6 +123,8 @@ class DB_Functions
 		 
 		 $uniq=array();
 		 $temp=array();
+		 $data=array();
+		 $temparr=array();
 		 $p=0;
 		 $s=0;
 		 $uniq=array_unique($data1);
@@ -131,15 +133,16 @@ class DB_Functions
 			 $p++;
 		 }
 		 //print_r($temp);die();
-		for($j=0;$j<count($temp);$j++){
+		 $k=0;
+		for($j=0;$j<count($uniq);$j++){
 			
 			$parking_id=$temp[$j];
 		$sql = "select  rl.user_id,rl.status,plm.latitude,plm.longitude,plm.lot_name,rl.lot_no,rl.reserv_date,rl.from_time from reservlot rl,parking_lot_master plm WHERE rl.parking_id=plm.id and rl.user_id='" . $user_id . "' and rl.parking_id='" .$parking_id. "'";
 		
 		$res = $this->conn->query($sql);
 		
-		$data=array();
-		$k=0;
+		
+		
 		          while($user1=$res->fetch_assoc()){
 					  
 				    $data[$k]['id']=$user1['user_id'];
@@ -150,13 +153,21 @@ class DB_Functions
 					$data[$k]['longitude']=$user1['longitude'];
 					$data[$k]['reserv_date']=$user1['reserv_date'];
 					$data[$k]['from_time']=$user1['from_time'];
+					
 				  $k++;
 				 }
-				    $response[$s]['data']=$data;
-				 $s++;
+				 //print_r($data);
+				   $response=$data;
+				   //$s++;
+				
+					/*  foreach (array_combine($temparr[$j],$temparr[$j]) as $name => $value) {
+						$jsonArray[] = $value;
+					}
+				 $s++; */ 
 					
 		     }
-			 
+			 //die();
+			//$response=$jsonArray;
 		 return $response;
 		}
 

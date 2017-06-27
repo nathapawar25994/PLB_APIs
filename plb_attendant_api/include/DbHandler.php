@@ -119,6 +119,7 @@ public function get_User_By_EmailAndPassword($email, $password) {
                 $data[$i]['reserve_id']=$user['reserve_id'];
                 $data[$i]['parking_id']=$user['parking_id'];      
                 $data[$i]['user_id']=$user['user_id'];
+				$data[$i]['vehical_type']=$user['vehical_type'];
                 $data[$i]['from_time']=$user['from_time'];
                 $data[$i]['to_time']=$user['to_time'];
                 $data[$i]['lot_no']=$user['lot_no'];
@@ -146,6 +147,7 @@ public function get_User_By_EmailAndPassword($email, $password) {
                 $data[$i]['reserve_id']=$user['reserve_id'];
                 $data[$i]['parking_id']=$user['parking_id'];      
                 $data[$i]['user_id']=$user['user_id'];
+				$data[$i]['vehical_type']=$user['vehical_type'];
                 $data[$i]['from_time']=$user['from_time'];
                 $data[$i]['to_time']=$user['to_time'];
                 $data[$i]['lot_no']=$user['lot_no'];

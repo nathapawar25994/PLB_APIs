@@ -53,12 +53,12 @@ $app->get('/attendantlist/:input', function($input) {
 
             if ($data != NULL) {
                 $response["error"] = false;
-                $response["message"] = "Logged in successfully";
+                $response["message"] = "List loaded successfully";
                 $response["data"] = $data;
                 jsonResponse(200,$response);
             } else {
                 $response["error"] = true;
-                $response["message"] = "Login credetianls are wrong. Please try again";
+                $response["message"] = "Failed to load list. Please try again";
                 jsonResponse(200,$response);
             }    
            

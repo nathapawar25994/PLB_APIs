@@ -9,9 +9,13 @@ if (!isset($_POST['user_id'] )) {
 	    $response["status"] =false;
 	    $response["error_msg"] = "Parking id is missing";
 	    echo json_encode($response);
-}else if(!isset($_POST['from_time'] )){
+}else if(!isset($_POST['parking_id'] )){
 	    $response["status"] =false;
-	    $response["error_msg"] = "from time is missing";
+	    $response["error_msg"] = "Parking id is missing";
+	    echo json_encode($response);
+}else if(!isset($_POST['vehical_type'] )){
+	    $response["status"] =false;
+	    $response["error_msg"] = "vehical_type is missing";
 	    echo json_encode($response);
 }else if(!isset($_POST['to_time'] )){
 	    $response["status"] =false;
@@ -26,9 +30,10 @@ if (!isset($_POST['user_id'] )) {
 	 $to_time=$_POST['to_time'];
 	 $lot_no=$_POST['lot_no'];
 	 $user_id=$_POST['user_id'];
+	 $vehical_type=$_POST['vehical_type'];
 	 $parking_id=$_POST['parking_id'];
 	 $reserv_date=$_POST['reserv_date'];
-	 $user = $db->reservLot($from_time,$to_time,$lot_no,$user_id,$parking_id,$reserv_date);
+	 $user = $db->reservLot($from_time,$to_time,$lot_no,$vehical_type,$user_id,$parking_id,$reserv_date);
 	 
 	 if ($user == 2) {
 		 $response["status"] =3;
